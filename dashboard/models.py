@@ -78,26 +78,26 @@ class Tickets_Users(models.Model):
     def __unicode__(self):
         return str(self.tu_id)
 
-# ## ticket Operation Record
-# class ticket_operating(models.Model):
-#     ticket = models.ForeignKey(tickets)
-#     operating_id = models.AutoField(primary_key=True)
-#     operating_per = models.CharField(max_length=30)
-#     operating_type = models.IntegerField()
-#     operating_ctime = models.DateTimeField(auto_now=False, auto_now_add=True)
-#     operating_content = models.TextField()
+## ticket Operation Record
+class Ticket_Operating(models.Model):
+    operating_id = models.AutoField(primary_key=True)
+    operating_operator = models.ForeignKey(Users)
+    operating_type = models.CharField(max_length=50)
+    operating_ctime = models.DateTimeField(auto_now=False, auto_now_add=True)
+    operating_content = models.TextField()
+    ticket_tickets = models.ForeignKey(Ticket_Tickets) 
 
-#     def __unicode__(self):
-#         return str(self.operating_id)
+    def __unicode__(self):
+        return str(self.operating_id)
 
-# ## ticket Reply to comment
-# class ticket_reply(models.Model):
-#     ticket = models.ForeignKey(tickets)
-#     reply_id = models.AutoField(primary_key=True)
-#     reply_author = models.CharField(max_length=30)
-#     reply_content = models.TextField()
-#     reply_ctime = models.DateTimeField(auto_now=False, auto_now_add=True)
-#     reply_mtime = models.DateTimeField(auto_now=True, auto_now_add=False)
+## ticket Reply to comment
+class Ticket_Reply(models.Model):
+    reply_id = models.AutoField(primary_key=True)
+    reply_author = models.ForeignKey(Users)
+    reply_content = models.TextField()
+    reply_ctime = models.DateTimeField(auto_now=False, auto_now_add=True)
+    reply_mtime = models.DateTimeField(auto_now=True, auto_now_add=False)
+    ticket_tickets = models.ForeignKey(Ticket_Tickets) 
 
-#     def __unicode__(self):
-#         return str(self.reply_id)
+    def __unicode__(self):
+        return str(self.reply_id)

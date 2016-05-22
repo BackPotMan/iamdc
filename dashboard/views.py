@@ -30,7 +30,6 @@ def getusers():
 
     return data_user
 
-
 def ticketload(request,deftype,user_login):
 
     load_search = request.GET.get("_search",'')
@@ -143,7 +142,31 @@ def ticketview(request,deftype,user_login):
                           'ticket_ctime':str(tickets_record.ticket_ctime),
                           'ticket_require':tickets_record.ticket_require
                           }
-    return tickets_info
+
+    all_operating = Ticket_Operating.objects.filter(ticket_tickets=tickets_record).order_by('operating_id')
+    all_reply = Ticket_Reply.objects.filter(ticket_tickets=tickets_record).order_by('reply_id')
+    operating_info = []
+    for operating in all_operating:
+        tmp_operating = {'operating_id':operating.operating_id,
+                         'operating_operator':operating.operating_operator.u_name,
+                         'operating_type':operating.operating_type,
+                         'operating_ctime':str(operating.operating_ctime),
+                         'operating_content':operating.operating_content
+                        }
+        operating_info.append(tmp_operating)
+
+    reply_info = [] 
+    for reply in all_reply:
+        tmp_reply = {'reply_id':reply.reply_id,
+                     'reply_author':reply.reply_author.u_name,
+                     'reply_content':reply.reply_content,
+                     'reply_ctime':str(reply.reply_ctime),
+                     'reply_mtime':str(reply.reply_mtime)
+                    }
+        reply_info.append(tmp_reply)
+
+
+    return {'tickets_info':tickets_info,'operating_info':operating_info,'reply_info':reply_info}
 
 def ticketcount(user_login):
     ### myticket
@@ -589,7 +612,6 @@ def usercenter(request):
 
 ###########################################
 def tickettype(request):
-
     if request.session.get('session_u_id',default=None):
         session_u_id = request.session.get('session_u_id')
         user_login = Users.objects.get(u_id=session_u_id)
@@ -833,6 +855,15 @@ def ticketadd(request):
                 checkleader_user_record = Users.objects.get(u_id = checkleader_uid)
                 Tickets_Users(ticket_tickets=add_ticket_entries,users=checkleader_user_record,status=1).save()
 
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=new_ticket_id)
+
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="创建工单",
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
+
         return HttpResponseRedirect("/myticket/")
 
         #if form_type == "login":
@@ -861,7 +892,10 @@ def myticket(request):
         # view
         elif str(request.GET.get('type','')) == "view":
             page_content = 1
-            tickets_info = ticketview(request,"myticket",user_login)
+            all_info= ticketview(request,"myticket",user_login)
+            tickets_info = all_info['tickets_info']
+            operating_info = all_info['operating_info']
+            reply_info = all_info['reply_info']
             return render_to_response('myticket.html',locals())
 
         else:
@@ -869,28 +903,70 @@ def myticket(request):
 
     elif request.method == 'POST' and request.POST.has_key('type'):
         print "x",request.method
+        return_data = {'status':0,'msg':""}
         if request.POST.get('type','') == "modifyticket":
             ticketid = request.POST.get('needticketid','') 
             require = request.POST.get('needrequire','') 
             print "ticketid:",ticketid
             if "submit" in request.POST:
                 Ticket_Tickets.objects.filter(ticket_id=ticketid).update(ticket_require=str(require),ticket_status=2)
+                operating_type = "提交工单"
             else:
                 Ticket_Tickets.objects.filter(ticket_id=ticketid).update(ticket_require=str(require),ticket_status=1)
+                operating_type = "修改工单"
+
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=ticketid)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type=operating_type,
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
+            return HttpResponse(json.dumps(return_data))
+
         elif request.POST.get('type','') == "cancelticket":
-            return_data = {'status':0,'msg':""}
+            
             ticketid = request.POST.get('ticket_id','')
             Ticket_Tickets.objects.filter(ticket_id=ticketid).update(ticket_status=1)
             cancel_ticket = Ticket_Tickets.objects.get(ticket_id=ticketid)
             Tickets_Users.objects.filter(ticket_tickets=cancel_ticket).update(status=1)
+
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="撤销工单",
+                                             operating_content="",
+                                             ticket_tickets=cancel_ticket
+                                            )
+            add_operating.save()
+
             return HttpResponse(json.dumps(return_data))
         elif request.POST.get('type','') == "deleteticket":
-            return_data = {'status':0,'msg':""}
+
             ticketid = request.POST.get('ticket_id','')
             Ticket_Tickets.objects.filter(ticket_id=ticketid).delete()
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=ticketid)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="删除工单",
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
+            return HttpResponse(json.dumps(return_data))
+
+        elif request.POST.get('type','') == "sendmessage":
+            message = request.POST.get('message','')
+            ticket_id = request.POST.get('ticket_id','')
+            ticket_record = Ticket_Tickets.objects.get(ticket_id=ticket_id)
+            print "message",message
+            add_reply = Ticket_Reply(
+                     reply_author=user_login,
+                     reply_content=str(message),
+                     ticket_tickets=ticket_record
+                    )
+            add_reply.save()
             return HttpResponse(json.dumps(return_data))
         else:
-            pass
+            print "messagxxxxx"
+
 
     return render_to_response('myticket.html',locals())
 
@@ -923,7 +999,10 @@ def mytask(request):
         # view
         elif str(request.GET.get('type','')) == "view":
             page_content = 1
-            tickets_info = ticketview(request,"mytask",user_login)
+            all_info= ticketview(request,"mytask",user_login)
+            tickets_info = all_info['tickets_info']
+            operating_info = all_info['operating_info']
+            reply_info = all_info['reply_info']
             return render_to_response('mytask.html',locals())
 
         else:
@@ -940,15 +1019,37 @@ def mytask(request):
             switch_executor = Users.objects.get(u_id=executor_uid)
             Ticket_Tickets.objects.filter(ticket_id=ticket_id).update(ticket_executor=switch_executor)
 
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=ticket_id)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="转发处理",
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
+            return HttpResponse(json.dumps(return_data))
 
             return HttpResponse(json.dumps(return_data))
         elif request.POST.get('type','') == "execokticket":
             ticket_id = str(request.POST.get("ticket_id",''))
             Ticket_Tickets.objects.filter(ticket_id=ticket_id).update(ticket_status=4)
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=ticket_id)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="确认执行",
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
             return HttpResponse(json.dumps(return_data))
         elif request.POST.get('type','') == "execnoticket":
             ticket_id = str(request.POST.get("ticket_id",''))
             Ticket_Tickets.objects.filter(ticket_id=ticket_id).update(ticket_status=1)
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=ticket_id)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="退回工单",
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
             return HttpResponse(json.dumps(return_data))
 
         elif request.POST.get('type','') == "ticketcomplete":
@@ -962,6 +1063,13 @@ def mytask(request):
                 Ticket_Tickets.objects.filter(ticket_id=ticketid).update(ticket_require=require,ticket_result=result,ticket_status=5)
             else:
                 Ticket_Tickets.objects.filter(ticket_id=ticketid).update(ticket_require=require,ticket_result=result,ticket_status=4)
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=ticketid)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="完成工单",
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
         elif request.POST.get('type','') == "ticketclose":
             ticketid = request.POST.get('needticketid','') 
             require = str(request.POST.get('needrequire',''))
@@ -971,6 +1079,13 @@ def mytask(request):
                 Ticket_Tickets.objects.filter(ticket_id=ticketid).update(ticket_require=require,ticket_result=result,ticket_status=9)
             else:
                 Ticket_Tickets.objects.filter(ticket_id=ticketid).update(ticket_require=require,ticket_result=result,ticket_status=3)
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=ticketid)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="关闭工单",
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
         else:
             pass
 
@@ -1005,7 +1120,10 @@ def mycheck(request):
         # view
         elif str(request.GET.get('type','')) == "view":
             page_content = 1
-            tickets_info = ticketview(request,"mycheck",user_login)
+            all_info= ticketview(request,"mycheck",user_login)
+            tickets_info = all_info['tickets_info']
+            operating_info = all_info['operating_info']
+            reply_info = all_info['reply_info']
             return render_to_response('mycheck.html',locals())
 
         else:
@@ -1025,11 +1143,26 @@ def mycheck(request):
             if not ticket_checkleader:
                 Ticket_Tickets.objects.filter(ticket_id=ticket_id).update(ticket_status=3)
 
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="审核通过",
+                                             operating_content="",
+                                             ticket_tickets=ticket_record
+                                            )
+            add_operating.save()
+
             return HttpResponse(json.dumps(return_data))
         elif request.POST.get('type','') == "checknoticket":
             ticket_id = str(request.POST.get("ticket_id",''))
             Ticket_Tickets.objects.filter(ticket_id=ticket_id).update(ticket_status=1)
+            new_ticket = Ticket_Tickets.objects.get(ticket_id=ticket_id)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="审核不通过",
+                                             operating_content="",
+                                             ticket_tickets=new_ticket
+                                            )
+            add_operating.save()
             return HttpResponse(json.dumps(return_data))
+
         elif request.POST.get('type','') == "forwarding":
             print "forwardingforwarding"
             ticket_id = str(request.POST.get("ticket_id",''))
@@ -1038,6 +1171,12 @@ def mycheck(request):
             switch_tickets = Ticket_Tickets.objects.get(ticket_id=ticket_id)
 
             Tickets_Users.objects.filter(ticket_tickets=switch_tickets,users=user_login).update(users=switch_checkleader)
+            add_operating = Ticket_Operating(operating_operator=user_login,
+                                             operating_type="转发审核",
+                                             operating_content="",
+                                             ticket_tickets=switch_tickets
+                                            )
+            add_operating.save()
             return HttpResponse(json.dumps(return_data))
         else:
             pass
@@ -1074,7 +1213,10 @@ def tickethistory(request):
         # view
         elif str(request.GET.get('type','')) == "view":
             page_content = 1
-            tickets_info = ticketview(request,"tickethistory",user_login)
+            all_info= ticketview(request,"tickethistory",user_login)
+            tickets_info = all_info['tickets_info']
+            operating_info = all_info['operating_info']
+            reply_info = all_info['reply_info']
             return render_to_response('tickethistory.html',locals())
 
         else:

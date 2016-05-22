@@ -180,9 +180,42 @@
 							</div>
 						</div>
 
+
 						<div class="widget-body">
-							<div class="widget-main">
-								<p>xxxxxxxx</p>
+							<div class="widget-main padding-8">
+								<div id="profile-feed-1" class="profile-feed">
+
+									{%for operating in operating_info%}
+									<div class="profile-activity clearfix">
+										<div>
+											<i class="pull-left thumbicon icon-picture btn-info no-hover"></i>
+											{{ operating.operating_ctime }}
+											<a class="user" href="#"> {{ operating.operating_operator }} </a>
+											{{ operating.operating_type }}
+											
+											<div>
+												{{ operating.operating_content }}
+											</div> 
+											<!-- <div class="time">
+												<i class="icon-time bigger-110"></i>
+												5 ago
+											</div>  -->
+										</div>
+
+										<!-- 										
+										<div class="tools action-buttons">
+											<a href="#" class="blue">
+												<i class="icon-pencil bigger-125"></i>
+											</a>
+
+											<a href="#" class="red">
+												<i class="icon-remove bigger-125"></i>
+											</a>
+										</div> -->
+									</div>
+									{%endfor %}
+
+								</div>
 							</div>
 						</div>
 					</div>
@@ -206,15 +239,28 @@
 						<div class="widget-body">
 							<div class="widget-main no-padding">
 								<div class="dialogs">
-									<p>xxxxxxxx</p>
+									<div id="profile-feed-1" class="profile-feed">
+										{%for reply in reply_info%}
+										<div class="profile-activity clearfix">
+											<div>
+												<i class="pull-left thumbicon icon-picture btn-info no-hover"></i>
+												{{ reply.reply_ctime }}
+												<a class="user" href="#"> {{ reply.reply_author }} </a>
+												<div>
+													{{ reply.reply_content }}
+												</div> 
+											</div>
+										</div>
+										{%endfor %}
+									</div>
 								</div>
 
 								<form>
 									<div class="form-actions">
 										<div class="input-group">
-											<input placeholder="在这里输入你的消息 ..." type="text" class="form-control" name="message" />
+											<input placeholder="在这里输入你的消息 ..." type="text" class="form-control" id="message" name="message" />
 											<span class="input-group-btn">
-												<button class="btn btn-sm btn-info no-radius" type="button">
+												<button class="btn btn-sm btn-info no-radius" type="button" onclick="SendMessage({{ tickets_info.ticket_id }});">
 													<i class="icon-share-alt"></i>
 													发送
 												</button>
@@ -585,5 +631,27 @@
 			    });
             }
 
+            function SendMessage(ticket_id){
+            	var_message = $("#message").val()
+			    if(var_message == ''){
+			        alert("请填写回复内容");
+			        $("#var_message").focus();
+			        return false;
+			    }
+
+			    $.ajax({
+			        url: '/myticket/',
+			        type: "POST",
+			        dataType: "json",
+			        data:{'type':"sendmessage",'message':var_message,'ticket_id':ticket_id},
+			        error: function () {
+			        	alert("SendMessage xx");
+			        },
+			        success: function (data) {
+			        	window.location.href="/myticket/?type=view&ticketid="+ticket_id
+			        }
+			    });
+
+            }
 		</script>
 {% endblock %}
