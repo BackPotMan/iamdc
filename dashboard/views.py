@@ -610,7 +610,6 @@ def usercenter(request):
 
     return render_to_response('users.html',locals())
 
-###########################################
 def tickettype(request):
     if request.session.get('session_u_id',default=None):
         session_u_id = request.session.get('session_u_id')
@@ -772,6 +771,23 @@ def tickettype(request):
             pass
         
     return render_to_response('tickettype.html',locals())
+
+def project(request):
+    if request.session.get('session_u_id',default=None):
+        session_u_id = request.session.get('session_u_id')
+        user_login = Users.objects.get(u_id=session_u_id)
+        user_info = {'u_id':user_login.u_id,'u_name':user_login.u_name,'u_enname':user_login.u_enname,
+                      'u_email':user_login.u_email,'u_role':user_login.u_role,'u_purview':user_login.u_purview,
+                      'u_status':user_login.u_status
+                      }
+        count = ticketcount(user_login)
+    else:
+        return HttpResponseRedirect("/login/")
+
+    return render_to_response('project.html',locals())
+
+
+##########################################
 
 def ticketadd(request):
 

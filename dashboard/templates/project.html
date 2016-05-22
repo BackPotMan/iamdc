@@ -1,0 +1,47 @@
+{% extends 'index.html' %}
+
+{% block head-page-specific-plugin-styles %}
+	<!-- 特定页面CSS -->
+		<link rel="stylesheet" href="/static/css/jquery-ui-1.10.3.full.min.css" />
+		<link rel="stylesheet" href="/static/css/datepicker.css" />
+		<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+{% endblock %}
+
+
+
+{% block body-breadcrumb %}
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="#">Home</a>
+							</li>
+							<li class="active">管理后台</li>
+							<li class="active">项目管理</li>
+						</ul><!-- .breadcrumb -->
+{% endblock %}
+
+
+{% block body-page-content %}
+					<div class="page-content">
+					   
+						<div class="row">
+						<p>项目管理</p>
+						</div><!-- /.row -->
+					    
+					</div><!-- /.page-content -->
+{% endblock %}
+
+
+
+<!-- page specific plugin scripts -->
+{% block body-page-specific-plugin-scripts %}
+	<!-- 特定页面scripts -->
+		<script src="/static/js/date-time/bootstrap-datepicker.min.js"></script>
+		<script src="/static/js/jqGrid/jquery.jqGrid.min.js"></script>
+		<script src="/static/js/jqGrid/i18n/grid.locale-en.js"></script>
+{% endblock %}
+
+	
+<!-- inline scripts related to this page -->
+{% block body-inline-scripts %}
+{% endblock %}
