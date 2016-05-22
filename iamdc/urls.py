@@ -25,7 +25,7 @@ urlpatterns = [
     url(r'^users/',dashboard_views.usercenter),
     url(r'^department/',dashboard_views.departmentmanage),
     url(r'^tickettype/',dashboard_views.tickettype),
-    url(r'^project/',dashboard_views.tickettype),
+    url(r'^project/',dashboard_views.project),
     url(r'^ticketadd/',dashboard_views.ticketadd),
     url(r'^mytask/',dashboard_views.mytask), 
     url(r'^myticket/$',dashboard_views.myticket),
