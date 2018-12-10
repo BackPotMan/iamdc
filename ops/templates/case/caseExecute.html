@@ -1,0 +1,393 @@
+{% extends "index.html" %}
+
+<!-- page specific plugin styles -->
+{% block HeadPageSpecificPluginStyles %}
+    <!-- 特定页面CSS -->
+    <link rel="stylesheet" href="/static/css/jquery-ui-1.10.3.full.min.css" />
+    <link rel="stylesheet" href="/static/css/datepicker.css" />
+    <link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+{% endblock %}
+
+{% block BodyPageContent %}
+    <div class="main-content">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <script type="text/javascript">
+                try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+            </script>
+            <ul class="breadcrumb">
+                <li>
+                    <i class="icon-home home-icon"></i>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">我的待办工单</li>
+            </ul><!-- .breadcrumb -->
+        </div>
+        <div class="page-content">
+            {% if caseview == 0 %}
+				<!-- 工单列表 -->
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="widget-box">
+							<div class="widget-header widget-header-small header-color-green3">
+								<h5 class="lighter">搜索框</h5>
+							</div>
+							<div class="widget-body">
+								<div class="widget-main">
+									<div class="row">
+										<div class="col-sm-4">
+											<input id="autosearch" name="autosearch" type="checkbox" class="ace" onclick="enableAutosubmit(this.checked)" />
+											<span class="lbl">启用自动搜索</span>
+										</div>
+									</div>
+									<br>
+									<div class="row">
+										<div class="col-sm-4">
+											<div class="input-group">
+											  <span class="input-group-addon">工单标题:</span>
+											  <input type="text" id="search_cnname" placeholder=" 请输入工单标题" class="form-control search-query " onkeydown="doSearch(arguments[0]||event)" aria-describedby="basic-addon3" >
+											</div>
+										</div>
+
+										<div class="col-sm-4">
+											<div class="input-group">
+												<span class="input-group-btn">
+													<button type="button" id="searchButton" name="searchButton" class="btn btn-purple btn-sm" onclick="gridReload();">
+														搜索
+														<i class="icon-search icon-on-right bigger-110"></i>
+													</button>
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<!-- PAGE CONTENT BEGINS -->
+						<table id="caseexecute-table"></table>
+						<div id="caseexecute-pager"></div>
+						<!-- PAGE CONTENT ENDS -->
+					</div><!-- /.col -->
+				</div><!-- /.row -->
+            {% else %}
+				<!-- 工单详情 -->
+				<div class="row">
+					<div class="space-4"></div>
+					<div class="space-4"></div>
+					<div class="space-4"></div>
+					<div class="space-4"></div>
+
+					<!--工单header-->
+					<div class="col-xs-12 col-sm-12">
+						<div class="table-responsive">
+							<table id="sample-table-1" class="table table-bordered">
+
+								<tbody>
+									<tr>
+										<td style="width:8%;" bgcolor='#b5bbed'><b>标题</b></td>
+										<td style="width:50%;">{{ viewData.case_title }}</td>
+										<td style="width:8%;" bgcolor='#b5bbed'><b>创建者</b></td>
+										<td >{{ viewData.case_createuser }}</td>
+									</tr>
+									<tr>
+										<td style="width:8%;" bgcolor='#b5bbed'><b>工单号</b></td>
+										<td style="width:50%;">{{ viewData.case_id }}</td>
+										<td style="width:8%;" bgcolor='#b5bbed'><b>创建时间</b></td>
+										<td>{{ viewData.case_ctime }}</td>
+									</tr>
+									<tr>
+										<td style="width:8%;" bgcolor='#b5bbed'><b>工单类型</b></td>
+										<td style="width:50%;">{{ viewData.case_type }}</td>
+										<td style="width:8%;" bgcolor='#b5bbed'><b>操作</b></td>
+										<td>
+											<div class="btn-group">
+												{% if viewData.case_status == 3 %}
+												<button class="btn btn-sm btn-success" onclick="CaseOperatingExecok('{{viewData.case_id}}','cancel','1');">确认执行</button>
+												<button class="btn btn-sm btn-warning" onclick="CaseOperatingExecno('{{viewData.case_id}}','cancel','1');">驳回申请</button>
+												<button class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalCaseForwarding" onclick="CaseForwarding('{{viewData.case_id}}');">转发处理</button>
+												{% endif %}
+											</div>
+
+										</td>
+									</tr>
+									<tr>
+										<td style="width:8%;" bgcolor='#b5bbed'><b>流程状态</b></td>
+										<td colspan="3">
+											<span class="label label-success arrowed-right arrowed-in">{{ viewData.case_createuser }}</span>
+											<!--<i class="icon-arrow-right icon-on-right"></i>-->
+											{% for audituser in viewData.audit_user %}
+												{% if audituser.status == 0 %}
+													<span class="label label-yellow arrowed-right arrowed-in">{{ audituser.name }}</span>
+												{% else %}
+													<span class="label label-success arrowed-right arrowed-in">{{ audituser.name }}</span>
+												{%endif%}
+												<!--<i class="icon-arrow-right icon-on-right"></i>-->
+											{% endfor%}
+											{% for execuser in viewData.exec_user %}
+												{% if execuser.status == 0 %}
+													<span class="label label-yellow arrowed-right arrowed-in">{{ execuser.name }}</span>
+												{% else %}
+													<span class="label label-success arrowed-right arrowed-in">{{ execuser.name }}</span>
+												{%endif%}
+												<!--<i class="icon-arrow-right icon-on-right"></i>-->
+											{% endfor%}
+											{% if viewData.case_status < 10 %}
+												<span class="label label-yellow arrowed-right arrowed-in">{{ viewData.case_createuser }}</span>
+											{%else%}
+												<span class="label label-success arrowed-right arrowed-in">{{ viewData.case_createuser }}</span>
+											{%endif%}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+
+						</div><!-- /.table-responsive -->
+					</div><!-- /span -->
+
+					<!--工单详情-->
+					<div class="col-xs-12 col-sm-12">
+						<div class="widget-box">
+							<div class="widget-header widget-header-blue widget-header-flat">
+								<h4>工单详情</h4>
+
+								<div class="widget-toolbar">
+
+									<a href="#" data-action="collapse">
+										<i class="icon-chevron-up"></i>
+									</a>
+								</div>
+							</div>
+
+							<div class="widget-body">
+								<div class="widget-main">
+									<form class="form-horizontal" role="form" action="/case/execute/" method="post">
+										<input type="hidden" id="caseid" name="caseid" value="{{ viewData.case_id }}" />
+										<div class="form-group">
+											<label class="col-sm-3 control-label no-padding-right" for="caserequire"> 需求 </label>
+
+											<div class="col-sm-9">
+												<textarea id="caserequire" name="caserequire" class="col-xs-10 col-sm-8"  placeholder="请输入你的需求" readonly="true" >{{ viewData.case_content }}</textarea>
+											</div>
+										</div>
+
+										<div class="space-4"></div>
+										{% if viewData.case_status == 4 or viewData.case_status == 5 or viewData.case_status == 9 %}
+										<input type="hidden" id="oper" name="oper" value="caseComplete"/>
+										<div class="form-group">
+											<label class="col-sm-3 control-label no-padding-right " for="caseresult"> 结果 </label>
+
+											<div class="col-sm-9">
+												<textarea id="caseresult" name="caseresult" class="col-xs-10 col-sm-8"  placeholder="请输入结果">{{ viewData.case_result }}</textarea>
+											</div>
+										</div>
+										<div class="space-4"></div>
+										<div class="clearfix form-actions">
+											<div class="col-md-offset-3 col-md-9">
+
+												<button class="btn btn-info" type="submit" id="complete" name="complete">
+													<i class="icon-ok bigger-110"></i>
+													确认完成
+												</button>
+												&nbsp; &nbsp; &nbsp;
+												<button class="btn btn-yellow" type="save" id="save" name="save">
+													<i class=" icon-hdd bigger-110"></i>
+																保存
+												</button>
+											</div>
+										</div>
+										{% elif viewData.case_status == 6 %}
+										<div class="form-group">
+											<label class="col-sm-3 control-label no-padding-right " for="caseresult"> 结果 </label>
+
+											<div class="col-sm-9">
+												<textarea id="caseresult" name="caseresult" class="col-xs-10 col-sm-8"  placeholder="请输入结果" readonly="true" >{{ viewData.case_result }}</textarea>
+											</div>
+										</div>
+										{% endif %}
+
+									</form>
+								</div>
+							</div>
+						</div>
+					</div><!-- /span -->
+
+					<!--操作记录-->
+					<div class="col-xs-12 col-sm-12">
+						<div class="widget-box">
+							<div class="widget-header widget-header-blue widget-header-flat">
+								<h4>操作记录</h4>
+
+								<div class="widget-toolbar">
+									<a href="#" data-action="collapse">
+										<i class="icon-chevron-up"></i>
+									</a>
+								</div>
+							</div>
+
+
+							<div class="widget-body">
+								<div class="widget-main padding-8">
+									<div id="profile-feed-1" class="profile-feed">
+
+										{% for operationUser in viewData['operation_user'] %}
+										<div class="profile-activity clearfix">
+											<div>
+												<i class="pull-left thumbicon icon-picture btn-info no-hover"></i>
+												{{ operationUser.ctime }}
+												<a class="user" href="#">{{ operationUser.name }}</a>
+												{{ operationUser.operation_type }}
+
+												<div>
+													{{ operationUser.content }}
+												</div>
+												<!-- <div class="time">
+													<i class="icon-time bigger-110"></i>
+													5 ago
+												</div>  -->
+											</div>
+
+											<!--
+											<div class="tools action-buttons">
+												<a href="#" class="blue">
+													<i class="icon-pencil bigger-125"></i>
+												</a>
+
+												<a href="#" class="red">
+													<i class="icon-remove bigger-125"></i>
+												</a>
+											</div> -->
+										</div>
+
+										{%endfor%}
+									</div>
+
+									<form>
+										<div class="form-actions">
+											<div class="input-group">
+												<input placeholder="在这里输入你的消息 ..." type="text" class="form-control" id="message" name="message" />
+												<span class="input-group-btn">
+													<button class="btn btn-sm btn-info no-radius" type="button" onclick="SendMessage({{ viewData.case_id }});">
+														<i class="icon-share-alt"></i>
+														发送
+													</button>
+												</span>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div><!-- /span -->
+
+					<!--评论回复-->
+					<div class="col-xs-12 col-sm-12">
+
+						<div class="widget-box">
+							<div class="widget-header widget-header-blue widget-header-flat">
+								<h4>评论回复</h4>
+
+								<div class="widget-toolbar">
+									<a href="#" data-action="collapse">
+										<i class="icon-chevron-up"></i>
+									</a>
+								</div>
+							</div>
+
+
+							<div class="widget-body">
+								<div class="widget-main no-padding">
+									<div class="dialogs">
+										<div id="profile-feed-1" class="profile-feed">
+											{%for replyUser in viewData['reply_user'] %}
+												<div class="profile-activity clearfix">
+													<div>
+														<i class="pull-left thumbicon icon-picture btn-info no-hover"></i>
+														{{ replyUser.ctime }}
+														<a class="user" href="#">{{ replyUser.name }}</a>
+														<div>
+															{{ replyUser.content }}
+														</div>
+													</div>
+												</div>
+											{% endfor %}
+										</div>
+									</div>
+
+									<form>
+										<div class="form-actions">
+											<div class="input-group">
+												<input placeholder="在这里输入你的消息 ..." type="text" class="form-control" id="message" name="message" />
+												<span class="input-group-btn">
+													<button class="btn btn-sm btn-info no-radius" type="button" onclick="SendMessage({{ viewData.case_id }});">
+														<i class="icon-share-alt"></i>
+														发送
+													</button>
+												</span>
+											</div>
+										</div>
+									</form>
+								</div><!-- /widget-main -->
+							</div><!-- /widget-body -->
+						</div>
+					</div><!-- /span -->
+
+				</div><!-- /.row -->
+				<div class="modal fade bs-example-modal-sm" id="modalCaseForwarding" name="modalCaseForwarding" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-sm">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<input type="hidden" id="caseid" name="caseid" value="0" />
+							<h4 class="modal-title" id="modal_delect_title">转发审核</h4>
+						</div>
+
+						<div class="modal-body">
+						<div class="row">
+							<form class="form-horizontal">
+
+								<div class="form-group">
+									<label class="col-sm-2 control-label no-padding-right" for="firstexecutor"> 转发至 </label>
+									<div class="col-sm-10">
+										<span>
+			                            	<select name="firstexecutor" id="firstexecutor" style="width:140px">
+			                            	</select>
+			                         	</span>
+									</div>
+								</div>
+							</form>
+						</div>
+						</div> <!-- END -->
+
+						<div class="modal-footer">
+							<button class="btn btn-info" id="submit" name="submit" onclick="sureCaseForwarding();">
+								<i class="icon-ok bigger-110"></i>
+								确定
+							</button>
+							&nbsp; &nbsp; &nbsp;
+							<button type="button" class="btn btn-default" data-dismiss="modal">
+								<i class="icon-remove bigger-110"></i>
+								取消
+							</button>
+			      		</div>
+			    	</div>
+				</div>
+			</div><!-- /.modal -->
+            {% endif %}
+        </div><!-- /.page-content -->
+    </div><!-- /.main-content -->
+{% endblock %}
+
+<!-- page specific plugin scripts -->
+{% block BodyPageSpecificPluginScripts %}
+    <!-- 特定页面scripts -->
+    <script src="/static/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="/static/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="/static/js/jqGrid/i18n/grid.locale-en.js"></script>
+{% endblock %}
+
+
+<!-- inline scripts related to this page -->
+{% block BodyInlineScripts %}
+	<script src="/static/js/ops/caseExecute.js"></script>
+{% endblock %}

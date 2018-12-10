@@ -1,0 +1,201 @@
+{% extends "index.html" %}
+
+<!-- page specific plugin styles -->
+{% block HeadPageSpecificPluginStyles %}
+    <!-- 特定页面CSS -->
+    <link rel="stylesheet" href="/static/css/jquery-ui-1.10.3.full.min.css" />
+    <link rel="stylesheet" href="/static/css/datepicker.css" />
+    <link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+{% endblock %}
+
+{% block BodyPageContent %}
+    <div class="main-content">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <script type="text/javascript">
+                try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+            </script>
+
+            <ul class="breadcrumb">
+                <li>
+                    <i class="icon-home home-icon"></i>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">工单类型管理</li>
+            </ul><!-- .breadcrumb -->
+
+        </div>
+        <div class="page-content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-small header-color-green3">
+                            <h5 class="lighter">搜索框</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <input id="autosearch" name="autosearch" type="checkbox" class="ace" onclick="enableAutosubmit(this.checked)" />
+                                        <span class="lbl">启用自动搜索</span>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                          <span class="input-group-addon">工单类型名称:</span>
+                                          <input type="text" id="search_cnname" placeholder=" 请输入类型名称" class="form-control search-query " onkeydown="doSearch(arguments[0]||event)" aria-describedby="basic-addon3" >
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button type="button" id="searchButton" name="searchButton" class="btn btn-purple btn-sm" onclick="gridReload();">
+                                                    搜索
+                                                    <i class="icon-search icon-on-right bigger-110"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12">
+					<!-- PAGE CONTENT BEGINS -->
+					<table id="casetype-table"></table>
+					<div id="casetype-pager"></div>
+					<!-- PAGE CONTENT ENDS -->
+				</div><!-- /.col -->
+            </div><!-- /.row -->
+            <div class="modal fade bs-example-modal-lg" id="modalCaseTypeOperating" name="modalCaseTypeOperating" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" >
+                <div class="modal-dialog modal-lg" style="width:70%">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" >&times;</button>
+                            <h4 class="modal-title" id="modal_operating_title">新增工单类型</h4>
+                            <input type="hidden" id="casetype_id" name="casetype_id" value="-1" />
+                        </div>
+
+                        <div class="modal-body">
+
+                            <div class="row">
+                                <form class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label no-padding-right" for="casetype_name"> 类型名称 </label>
+
+                                        <div class="col-sm-6">
+                                            <input id="casetype_name" name="casetype_name" type="text" placeholder="请输入工单类型名称" class="col-xs-10 col-sm-8" />
+                                        </div>
+                                    </div>
+                                    <div class="space-4"></div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label no-padding-right" for="casetype_executor"> 工单处理人 </label>
+
+                                        <div class="col-sm-7">
+                                            <select class="col-xs-10 col-sm-4" id="casetype_executor" name="casetype_executor">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="space-4"></div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label no-padding-right" for="casetype_checkleader"> 审核流程 </label>
+
+                                        <div class="col-sm-10">
+                                            <span class="firstcheckleader">
+                                                <select class="checkleader" name="firstcheckleader" id="firstcheckleader" style="width:100px" onchange="changeCheckLeader(this);">
+                                                    <option value="-1" >默认上级</option>
+                                                    <option value = "-2">指定人选</option>
+                                                </select>
+                                            </span>
+                                            <a class="btn btn-xs btn-primary" onclick="addCheckLeaderCSS(this)" style="margin-left: 5px;" id="addcheckleader">添加一级</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div> <!-- END -->
+
+                        <div class="modal-footer">
+                            <button class="btn btn-info" id="submit" name="submit" onclick="addCaseType();">
+                                <i class="icon-ok bigger-110"></i>
+                                提交
+                            </button>
+                            <!--
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-yellow" type="reset">
+                                <i class="icon-undo bigger-110"></i>
+                                重置
+                            </button>-->
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                <i class="icon-remove bigger-110"></i>
+                                关闭
+                            </button>
+                        </div>
+                    </div>
+                </div>
+		    </div><!-- /.modal -->
+		    <div class="modal fade bs-example-modal-sm" id="modalCaseTypeDelete" name="modalCaseTypeDelete" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="modal_delect_title">删除工单类型</h4>
+                            <input type="hidden" id="casetype_id_list" name="casetype_id_list" value="-1" />
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="row">
+
+                                <div class="col-sm-6">
+                                    <p><b>确认删除工单类型吗 ?</b></p>
+                                    <ul id="suredellist">
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div> <!-- END -->
+
+                        <div class="modal-footer">
+                            <button class="btn btn-info" id="submit" name="submit" onclick="sureDelCaseType();">
+                                <i class="icon-ok bigger-110"></i>
+                                确定
+                            </button>
+                            <!--
+                            &nbsp; &nbsp; &nbsp;
+                            <button class="btn btn-yellow" type="reset">
+                                <i class="icon-undo bigger-110"></i>
+                                重置
+                            </button>-->
+
+                            &nbsp; &nbsp; &nbsp;
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                <i class="icon-remove bigger-110"></i>
+                                取消
+                            </button>
+                        </div>
+                    </div>
+                </div>
+		    </div><!-- /.modal -->
+        </div><!-- /.page-content -->
+    </div><!-- /.main-content -->
+{% endblock %}
+
+<!-- page specific plugin scripts -->
+{% block BodyPageSpecificPluginScripts %}
+    <!-- 特定页面scripts -->
+    <script src="/static/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="/static/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="/static/js/jqGrid/i18n/grid.locale-en.js"></script>
+{% endblock %}
+
+
+<!-- inline scripts related to this page -->
+{% block BodyInlineScripts %}
+    <script src="/static/js/ops/caseType.js"></script>
+{% endblock %}

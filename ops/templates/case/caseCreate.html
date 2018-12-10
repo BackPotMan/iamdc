@@ -1,0 +1,223 @@
+{% extends "index.html" %}
+
+<!-- page specific plugin styles -->
+{% block HeadPageSpecificPluginStyles %}
+    <!-- 特定页面CSS -->
+    <!--<link rel="stylesheet" href="/static/css/jquery-ui-1.10.3.full.min.css" />-->
+    <!--<link rel="stylesheet" href="/static/css/datepicker.css" />-->
+    <!--<link rel="stylesheet" href="/static/css/ui.jqgrid.css" />-->
+{% endblock %}
+
+{% block BodyPageContent %}
+    <div class="main-content">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <script type="text/javascript">
+                try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+            </script>
+
+            <ul class="breadcrumb">
+                <li>
+                    <i class="icon-home home-icon"></i>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">新建工单</li>
+            </ul><!-- .breadcrumb -->
+
+        </div>
+
+        <div class="page-content">
+            <div class="page-header">
+                <h1>
+                    新建工单
+                    <small>
+                        <i class="icon-double-angle-right"></i>
+                        开始创建一个新的工单
+                    </small>
+                </h1>
+            </div><!-- /.page-header -->
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <!-- PAGE CONTENT BEGINS -->
+
+                    <div class="tabbable">
+                        <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
+                            <li class="active">
+                                <a data-toggle="tab" href="#faq-tab-1">
+                                    通用类
+                                </a>
+                            </li>
+
+                            <li>
+                                <a data-toggle="tab" href="#faq-tab-2">
+                                    资源/权限类
+                                </a>
+                            </li>
+
+                            <li>
+                                <a data-toggle="tab" href="#faq-tab-3">
+                                    操作/执行类
+                                </a>
+                            </li>
+
+                            <li class="dropdown">
+                                <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                                    其他
+                                    <!--<i class="icon-caret-down"></i>-->
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-lighter dropdown-125">
+                                    <li>
+                                        <a data-toggle="tab" href="#faq-tab-4"> 测试1 </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-toggle="tab" href="#faq-tab-4"> 测试2 </a>
+                                    </li>
+                                </ul>
+                            </li><!-- /.dropdown -->
+                        </ul>
+
+                        <div class="tab-content no-border padding-24">
+                            <div id="faq-tab-1" class="tab-pane fade in active">
+                                <h4 class="blue">
+                                    <i class="icon-ok bigger-110"></i>
+                                    通用类问题
+                                </h4>
+
+                                <div class="space-8"></div>
+
+                                <div id="faq-list-1" class="panel-group accordion-style1 accordion-style2">
+                                    <form class="form-horizontal" role="form" action="/case/create/" method="post">
+                                        <input type="hidden" id="oper" name="oper" value="addCase"/>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right" for="casetype"> 工单类型 </label>
+
+                                            <div class="col-sm-9">
+                                                <select class="col-xs-10 col-sm-4" id="casetype" name="casetype">
+                                                        <option value="0"> --请选择工单类型-- </option>
+                                                        {% for casetype_record in casetype_list%}
+                                                        <option value="{{casetype_record.casetype_id}}">{{casetype_record.casetype_name}}</option>
+                                                        {%endfor%}
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right" for="casetitle"> 标题 </label>
+
+                                            <div class="col-sm-9">
+                                                <input id="casetitle" name="casetitle" type="text" placeholder="请输入需求标题" class="col-xs-10 col-sm-8" />
+                                            </div>
+                                        </div>
+
+                                        <div class="space-4"></div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right" for="caserequire"> 需求 </label>
+
+                                            <div class="col-sm-9">
+                                                <textarea id="caserequire" name="caserequire" class="col-xs-10 col-sm-8"  placeholder="请输入你的需求"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-4"></div>
+
+                                        <div class="form-group hide">
+                                            <label class="col-sm-3 control-label no-padding-right " for="caseresult"> 结果 </label>
+
+                                            <div class="col-sm-9">
+                                                <textarea id="caseresult" name="caseresult" class="col-xs-10 col-sm-8"  placeholder="请输入处理结果"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-4"></div>
+
+                                        <div class="clearfix form-actions">
+                                            <div class="col-md-offset-4 col-md-9">
+
+                                                <button class="btn btn-info" type="submit" id="submit" name="submit">
+                                                    <i class="icon-ok bigger-110"></i>
+                                                    提交
+                                                </button>
+
+                                                &nbsp; &nbsp; &nbsp;
+                                                <button class="btn btn-yellow" type="submit" id="save" name="save">
+                                                    <i class=" icon-hdd bigger-110"></i>
+                                                    保存
+                                                </button>
+
+                                                &nbsp; &nbsp; &nbsp;
+                                                <button class="btn" type="reset">
+                                                    <i class="icon-undo bigger-110"></i>
+                                                    重置
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div id="faq-tab-2" class="tab-pane fade">
+                                <h4 class="blue">
+                                    <i class="green icon-user bigger-110"></i>
+                                    资源/权限类
+                                </h4>
+
+                                <div class="space-8"></div>
+
+                                <div id="faq-list-2" class="panel-group accordion-style1 accordion-style2">
+
+                                </div>
+                            </div>
+
+                            <div id="faq-tab-3" class="tab-pane fade">
+                                <h4 class="blue">
+                                    <i class="orange icon-credit-card bigger-110"></i>
+                                    Payment Questions
+                                </h4>
+
+                                <div class="space-8"></div>
+
+                                <div id="faq-list-3" class="panel-group accordion-style1 accordion-style2">
+
+                                </div>
+                            </div>
+
+                            <div id="faq-tab-4" class="tab-pane fade">
+                                <h4 class="blue">
+                                    <i class="purple icon-magic bigger-110"></i>
+                                    操作/执行类
+                                </h4>
+
+                                <div class="space-8"></div>
+
+                                <div id="faq-list-4" class="panel-group accordion-style1 accordion-style2">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.page-content -->
+
+    </div><!-- /.main-content -->
+{% endblock %}
+
+<!-- page specific plugin scripts -->
+{% block BodyPageSpecificPluginScripts %}
+    <!-- 特定页面scripts -->
+    <!--<script src="/static/js/date-time/bootstrap-datepicker.min.js"></script>-->
+    <!--<script src="/static/js/jqGrid/jquery.jqGrid.min.js"></script>-->
+    <!--<script src="/static/js/jqGrid/i18n/grid.locale-en.js"></script>-->
+{% endblock %}
+
+
+<!-- inline scripts related to this page -->
+{% block BodyInlineScripts %}
+{% endblock %}
