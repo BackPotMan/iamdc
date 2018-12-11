@@ -13,7 +13,8 @@ python 版本: Python 2.7.10
    pip install virtualenv
 
 2、为一个工程创建一个虚拟环境
-   mkdir /opt/project
+   mkdir /opt/project ;
+   
    cd /opt/project && virtualenv venv
 
 3、激活虚拟环境
@@ -30,7 +31,8 @@ python 版本: Python 2.7.10
    第一次使用  python manager.py db init
 
    后面每次有表修改执行下面两句进行修改
-   python manager.py db migrate
+   python manager.py db migrate ;
+   
    python manager.py db upgrade
 
 7、运行启动
