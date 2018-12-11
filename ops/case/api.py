@@ -32,12 +32,14 @@ def caseTypeList():
         casetype_name = str(request.form['casetype_name'])
         casetype_executor = int(request.form['casetype_executor'])
         casetype_checkleader = str(request.form['casetype_checkleader']).split(',')
+        casetype_status = int(request.form['casetype_status'])
 
         try:
             ## 新增工单类型
             addCaseType = casetype()
             addCaseType.name = casetype_name
             addCaseType.createuser_id = loginData['user']['id']
+            addCaseType.status = casetype_status
             db.session.add(addCaseType)
 
             ## 添加执行人
@@ -81,11 +83,13 @@ def caseTypeList():
         casetype_name = str(request.form['casetype_name'])
         casetype_executor = int(request.form['casetype_executor'])
         casetype_checkleader = str(request.form['casetype_checkleader']).split(',')
+        casetype_status = int(request.form['casetype_status'])
 
         try:
             ## 编辑工单类型
             editCaseType = casetype.query.filter(casetype.id == casetype_id).first()
             editCaseType.name = casetype_name
+            editCaseType.status = casetype_status
             db.session.add(editCaseType)
 
             ## 删除执行人和审核人
@@ -125,6 +129,7 @@ def caseTypeList():
         rData = {}
         rData['id'] = getData.id
         rData['name'] = getData.name
+        rData['status'] = getData.status.value
 
         rData['executor'] = []
         for execModel in getData.exec_model:
@@ -311,7 +316,7 @@ def caseCreate():
         return redirect("/case/mycreate/")
 
     else:
-        getData = casetype.query.filter().all()
+        getData = casetype.query.filter(casetype.status == 1).all()
         for record in getData:
             returnData['data'].append({'casetype_id':record.id,'casetype_name':record.name})
 

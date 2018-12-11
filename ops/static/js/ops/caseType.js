@@ -386,6 +386,7 @@ function addCaseType(){
         return false;
     }
 
+    var casetype_status_val = $("#casetype_status").find("option:selected").val();
 
     var checkleaderarr =[];
     $(".checkleader").each(function(){
@@ -410,7 +411,7 @@ function addCaseType(){
         url: '/case/type/',
         type: "POST",
         dataType: "json",
-        data:{'oper':post_type,'casetype_id':var_casetype_id,'casetype_name':var_casetype_name,'casetype_executor':casetype_executor_val,'casetype_checkleader':var_checkleader},
+        data:{'oper':post_type,'casetype_id':var_casetype_id,'casetype_name':var_casetype_name,'casetype_executor':casetype_executor_val,'casetype_checkleader':var_checkleader,'casetype_status':casetype_status_val},
         error: function () {
             alert(post_type +" error");
         },
@@ -445,6 +446,8 @@ function editCaseType(typeid){
                 type_executor_val = executor.split("_")[0]
                 $("#casetype_executor").find("option[value='"+type_executor_val+"']").attr("selected",true);
             }
+
+            $("#casetype_status").find("option[value='"+data['status']+"']").attr("selected",true);
 
             var oplist = new Array();
             for(key_num in data['users']){
