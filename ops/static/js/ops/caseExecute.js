@@ -350,7 +350,7 @@ function getExecutor(){
         url: '/users/user/',
         type: "POST",
         dataType: "json",
-        data:{'oper':"getusers"},
+        data:{'oper':"getUsers"},
         error: function () {
             $("#firstexecutor").html('<option value="0" >--选择执行人--</option>');
         },
@@ -358,7 +358,7 @@ function getExecutor(){
 
             var oplist = new Array();
             for( key_num in data ){
-                oplist.push('<option value="' + data[key_num]['id'] + '">' + data[key_num]['cnname'] + '(' + data[key_num]['name']  + ')</option>');
+                oplist.push('<option value="' + data['data'][key_num]['id'] + '">' + data['data'][key_num]['cnname'] + '(' + data['data'][key_num]['name']  + ')</option>');
             }
 
             $("#firstexecutor").html('<option value="0" >--选择执行人--</option>'+oplist.join(''));

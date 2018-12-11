@@ -1,32 +1,40 @@
 
-var casecheck_grid = "#casecheck-table";
-var casecheck_pager = "#casecheck-pager";
+var project_grid = "#project-table";
+var project_pager = "#project-pager";
 
 jQuery(function($) {
 
-    //table
-    jQuery(casecheck_grid).jqGrid({
+    // table
+    jQuery(project_grid).jqGrid({
         //direction: "rtl",
         //data: 'json',
         //mtype: 'POST',
-        url: '/case/check?type=load',
+        url: '/assets/project?type=load',
         datatype: "json",
         height: 'auto',
-        colNames:['ID','工单标题','工单类型','当前处理人','状态','创建时间',' '],
+        colNames:['ID','项目名称','英文名','负责人','创建时间','修改时间',' '],
         colModel:[
             {name:'id',index:'id', width:70, sorttype:"int", editable: false},
-            {name:'title',index:'title', width:150,editable: false,editoptions:{size:"20",maxlength:"30"}},
-            {name:'casetype',index:'casetype', width:150,editable: false,editoptions:{size:"20",maxlength:"30"}},
-            {name:'user',index:'user', width:110,editable: false,eeditoptions:{size:"20",maxlength:"30"}},
-            {name:'status',index:'status', width:110,editable: false},
+            {name:'name',index:'name', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
+            {name:'enname',index:'enname', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
+            {name:'leader',index:'leader', width:110,editable: true,edittype:"select",editoptions:{value:getUsers}},
             {name:'ctime',index:'ctime', width:110,editable: false},
-            {name:'myac',index:'', width:80, fixed:true, sortable:false, resize:false}
+            {name:'mtime',index:'mtime', width:110,editable: false},
+            {name:'myac',index:'', width:80, fixed:true, sortable:false, resize:false,
+                formatter:'actions',
+                formatoptions:{
+                    keys:true,
+                    delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
+                    //editformbutton:true,
+                    editOptions:{recreateForm: true,beforeShowForm:beforeEditCallback}
+                }
+            }
         ],
 
         viewrecords : true,
         rowNum:10,
         rowList:[10,20,30],
-        pager : casecheck_pager,
+        pager : project_pager,
         altRows: true,
         //toppager: true,
 
@@ -44,8 +52,8 @@ jQuery(function($) {
             }, 0);
         },
 
-        editurl: '/case/check/',//nothing is saved 注意结尾/ , APPEND_SLASH
-        caption: "我的创建工单",
+        editurl: '/assets/project/',//nothing is saved 注意结尾/ , APPEND_SLASH
+        caption: "项目管理",
         autowidth: true,
 
         jsonReader: {
@@ -55,37 +63,43 @@ jQuery(function($) {
             records: "records",
             repeatitems: false,
         },
-
-        // 定义编辑/删除按钮
-        gridComplete : function() {
-          var ids = jQuery(casecheck_grid).jqGrid('getDataIDs');
-          for ( var i = 0; i < ids.length; i++) {
-            var caseID=$(casecheck_grid).jqGrid('getCell',ids[i],1);
-            be = "<a href='/case/check/?type=view&caseID="+caseID+"'><button class='btn btn-sm btn-info'>详情</button></a>";
-            jQuery(casecheck_grid).jqGrid('setRowData', ids[i],
-                {
-                  myac : be
-                });
-          }
-        },
-
     });
 
     //navButtons
-    jQuery(casecheck_grid).jqGrid('navGrid',casecheck_pager,
+    jQuery(project_grid).jqGrid('navGrid',project_pager,
         { 	//navbar options
-            edit: false,
+            edit: true,
             editicon : 'icon-pencil blue',
-            add: false,
+            add: true,
             addicon : 'icon-plus-sign purple',
             del: true,
             delicon : 'icon-trash red',
             search: false,
             searchicon : 'icon-search orange',
-            refresh: false,
+            refresh: true,
             refreshicon : 'icon-refresh green',
             view: true,
             viewicon : 'icon-zoom-in grey',
+        },
+        {
+            //edit record form
+            //closeAfterEdit: true,
+            recreateForm: true,
+            beforeShowForm : function(e) {
+                var form = $(e[0]);
+                form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+                style_edit_form(form);
+            },
+            afterSubmit : function(response, postdata) {
+                //alert(response.responseText);
+                var result = eval("(" + response.responseText + ")")
+
+                if(result.status == 1 ){
+                    return [false,result.message,''];
+                }else {
+                    return [true,result.message,''] ;
+                }
+            }
         },
         {
             //new record form
@@ -163,7 +177,7 @@ jQuery(function($) {
     )
 
     //enable search/filter toolbar
-    //jQuery(casecheck_grid).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
+    //jQuery(project_grid).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
 
     function style_edit_form(form) {
         //enable datepicker on "sdate" field and switches for "stock" field
@@ -277,121 +291,29 @@ jQuery(function($) {
         $('.navtable .ui-pg-button').tooltip({container:'body'});
         $(table).find('.ui-pg-div').tooltip({container:'body'});
     }
+
 });
 
 
-function CaseOperatingCheckok(caseid){
-
-    $.ajax({
-        url: '/case/check/',
-        type: "POST",
-        dataType: "json",
-        data:{'oper':'caseCheckOK','caseid':caseid},
-        error: function () {
-            alert("mycheck xx");
-        },
-        success: function (data) {
-            window.location.href="/case/check/"
-        }
-    });
-}
-
-function CaseOperatingCheckno(caseid){
-
-    $.ajax({
-        url: '/case/check/',
-        type: "POST",
-        dataType: "json",
-        data:{'oper':'caseCheckNO','caseid':caseid},
-        error: function () {
-            alert("mycheck xx");
-        },
-        success: function (data) {
-            window.location.href="/case/check/"
-        }
-    });
-}
-
-function CaseForwarding(caseid){
-    document.getElementById('caseid').value = caseid ;
-    getCheckLeader();
-}
-
-function sureCaseForwarding(){
-
-    var var_ticket_id = $("#caseid").val();
-
-    var switchCheckLeader_val = $("#firstcheckleader").find("option:selected").val();
-    if(switchCheckLeader_val == '0'){
-        alert("请选择审核人");
-        $("#firstcheckleader").focus();
-        return false;
-    }
-
-    $.ajax({
-        url: '/case/check/',
-        type: "POST",
-        dataType: "json",
-        data:{'oper':'caseForwarding','caseid':var_ticket_id,'checkleader_id':switchCheckLeader_val},
-        error: function () {
-            alert("mycheck xx");
-        },
-        success: function (data) {
-            window.location.href="/case/check/"
-        }
-    });
-
-}
-
-// 获取审核人名单,设置(指定审核人)下拉选择框
-function getCheckLeader(){
+// 获取用户名单,设置下拉选择框
+function getUsers(){
+    var users_str = ""
     $.ajax({
         url: '/users/user/',
         type: "POST",
         dataType: "json",
         data:{'oper':"getUsers"},
+        async:false,  //设置为同步，等这个ajax有了返回值后才会执行下面的js
         error: function () {
-            $("#firstcheckleader").html('<option value="0" >--选择审核人--</option>');
+            alert("getUsers error");
         },
         success: function (data) {
-
-            var oplist = new Array();
-            for( key_num in data['data'] ){
-                oplist.push('<option value="' + data['data'][key_num]['id'] + '">' + data['data'][key_num]['cnname'] + '(' + data['data'][key_num]['name']  + ')</option>');
-            }
-
-            $("#firstcheckleader").html('<option value="0" >--选择审核人--</option>'+oplist.join(''));
-            oplist = null;
+            users_str = data['message'];
+            //alert(data['data']);
         }
     });
-}
 
-//关闭 modalCaseForwarding 时触发
-$('#modalCaseForwarding').on('hide.bs.modal', function (e) {
-    document.getElementById('caseid').value = "0";
-    $("#firstcheckleader").empty();
-})
-
-function SendMessage(caseid){
-    var_message = $("#message").val()
-    if(var_message == ''){
-        alert("请填写回复内容");
-        $("#var_message").focus();
-        return false;
-    }
-
-    $.ajax({
-        url: '/case/mycreate/',
-        type: "POST",
-        dataType: "json",
-        data:{'oper':"sendMessage",'message':var_message,'caseid':caseid},
-        error: function () {
-            alert("SendMessage xx");
-        },
-        success: function (data) {
-            window.location.href="/case/check/?type=view&caseID="+caseid
-        }
-    });
+    return users_str
 }
 
 
@@ -413,8 +335,8 @@ function doSearch(ev) {
 function gridReload(){
     var search_enname = jQuery("#search_enname").val()||"";
     var search_cnname = jQuery("#search_cnname").val()||"";
-    jQuery(casecheck_grid).jqGrid('setGridParam', {
-        url : "/case/check/?type=search&search_enname=" + search_enname+"&search_cnname="+search_cnname,
+    jQuery(project_grid).jqGrid('setGridParam', {
+        url : "/assets/project/?type=search&search_enname=" + search_enname+"&search_cnname="+search_cnname,
         page : 1
     }).trigger("reloadGrid");
 }

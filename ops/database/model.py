@@ -294,3 +294,168 @@ class caseoperation(db.Model):
 
     def __unicode__(self):
         return u'id: %d' % self.id
+
+
+class project(db.Model):
+    """
+    项目表
+    """
+    #__tablename__ = 'project'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    # 项目名称
+    name = db.Column(db.String(100), nullable=False, unique=True, index=True)
+    # 项目英文名称
+    enname = db.Column(db.String(100), nullable=False)
+    # 负责人(外键到用户表)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # 负责人(关系反向映射)
+    user = db.relationship('user', foreign_keys=user_id, backref='project')
+    # 创建时间
+    ctime = db.Column(db.DateTime, default=datetime.datetime.now)
+    # 修改时间
+    mtime = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u"%s" % self.name
+
+class engineroom(db.Model):
+    """
+    机房表
+    """
+    #__tablename__ = 'engineroom'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    # 机房名称
+    name = db.Column(db.String(100), nullable=False, unique=True, index=True)
+    # 英文名称
+    enname = db.Column(db.String(100), nullable=True)
+    # 联系人
+    contact = db.Column(db.String(100), nullable=True)
+    # 电话
+    phone = db.Column(db.String(30), nullable=True)
+    # 邮箱
+    mail = db.Column(db.String(200), nullable=True)
+    # 机房地址
+    address = db.Column(db.String(255), nullable=True)
+    # 创建时间
+    ctime = db.Column(db.DateTime, default=datetime.datetime.now)
+    # 修改时间
+    mtime = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u"%s" % self.name
+
+# class Network(db.Model):
+#     """
+#     网络IP
+#     """
+#     # __tablename__ = 'network'
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     # ip 地址
+#     ip_address = db.Column(db.String(50), nullable=False)
+#     # ip 版本号
+#     IP_VERSION_STR = [(4, u'ipv4'),
+#                      (6, u'ipv6')
+#                      ]
+#     ip_version = db.Column(ChoiceTypeInteger(IP_VERSION_STR), nullable=False,default=4)
+#     # ip 类型
+#     IP_TYPE_STR = [(1, u'内网'),
+#                       (2, u'外网'),
+#                       (3, u'内网VIP'),
+#                       (4, u'外网VIP')
+#                       ]
+#     ip_type = db.Column(ChoiceTypeInteger(IP_TYPE_STR), nullable=False, default=4)
+#     # 所属机房(外键到机房表)
+#     engineroom_id = db.Column(db.Integer, db.ForeignKey('engineroom.id'), nullable=False)
+#     # 所属机房(关系反向映射)
+#     engineroom = db.relationship('Engineroom', foreign_keys=engineroom_id, backref='network')
+#     # 带宽类型
+#     BANDWIDTH_TYPE_STR = [(1, u'独享带宽'),
+#                   (2, u'共享带宽')]
+#     bandwidth_type = db.Column(ChoiceTypeInteger(BANDWIDTH_TYPE_STR), nullable=False,default=2)
+#     # 带宽大小
+#     bandwidth_size = db.Column(db.String(10), nullable=True)
+#     # 绑定类型
+#     BIND_TYPE_STR = [(0,u"未选择设备类型"),(1,u'主机'),(2,u'路由'),(3,u'交换机')]
+#     bind_type = db.Column(ChoiceTypeInteger(BIND_TYPE_STR), nullable=False,default=0)
+#     # 绑定设备ID
+#     bind_id = db.Column(db.String(100), nullable=True)
+#     # 状态
+#     STATUS_NETWORK_STR = [(1, u'未绑定'),(2, u'已绑定'),(3, u'已冻结')]
+#     status = db.Column(ChoiceTypeInteger(STATUS_NETWORK_STR), nullable=False, default=1)
+#     # 创建时间
+#     ctime = db.Column(db.DateTime, default=datetime.datetime.now)
+#     # 修改时间
+#     mtime = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+#
+# class Server(db.Model):
+#     """
+#     服务器主机
+#     """
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     # 主机名
+#     hostname = db.Column(db.String(200), nullable=False)
+#     # 资产编号
+#     property_no = db.Column(db.String(100), unique=True, nullable=True)
+#     # 服务器资产类型
+#     PROPERTY_TYPE_STR = [(1, u'自购'),
+#                          (2, u'租用'),
+#                          (3, u'第三方提供')]
+#     property_type = db.Column(ChoiceTypeInteger(PROPERTY_TYPE_STR), nullable=False)
+#     # 服务器使用类型
+#     USE_TYPE_STR = [(1, u'本司自用'),
+#                     (2, u'第三方使用')]
+#     use_type = db.Column(ChoiceTypeInteger(USE_TYPE_STR), nullable=False)
+#     # 是否vm虚拟机, 不是虚拟机则用0表示, 否则就代表虚拟机的宿主机id
+#     is_vm = db.Column(db.SmallInteger, nullable=False, default=0)
+#     # 服务器使用状态
+#     STATUS_STR = [(101,u'在用-正常使用中'),
+#                   (102,u'空闲-正常空闲'),
+#                   (103,u'已报废'),
+#                   (104,u'已退租')]
+#     status = db.Column(ChoiceTypeInteger(STATUS_STR), nullable=False)
+#     # 主机所属机房
+#     engineroom_id = db.Column(db.Integer, db.ForeignKey('engineroom.id'), nullable=False)
+#     # 主机所属机房
+#     engineroom = db.relationship('Engineroom', foreign_keys=engineroom_id, backref='server')
+#     # 主机项目
+#     serverproject = db.relationship('Serverproject', backref=db.backref('serverproject', lazy='dynamic', uselist=True),cascade="all, delete, delete-orphan")
+#     # 主机IP
+#     serverip = db.relationship('Serverip', backref=db.backref('serverip', lazy='dynamic', uselist=True),cascade="all, delete, delete-orphan")
+#     # 创建时间
+#     ctime = db.Column(db.DateTime, default=datetime.datetime.now)
+#     # 修改时间
+#     mtime = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+#
+#     def __unicode__(self):
+#         return u'propertyNo: %s , propertyType: %s , saltid: %s' % (self.propertyNo, self.propertyType, self.isVM)
+#
+# class Serverip(db.Model):
+#     """
+#     服务器挂钩多个IP地址
+#     """
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     # 服务器
+#     server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+#     server = db.relationship('Server', foreign_keys=server_id)
+#     # 主机绑定IP(外键到网络表)
+#     network_id = db.Column(db.Integer, db.ForeignKey('network.id'), nullable=False)
+#     # 主机绑定IP(关系反向映射)
+#     network = db.relationship('Network', foreign_keys=network_id, backref='serverip')
+#
+#     def __unicode__(self):
+#         return u'id: %d' % self.id
+#
+# class Serverproject(db.Model):
+#     """
+#     服务器挂钩多个项目
+#     """
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     # 服务器
+#     server_id = db.Column(db.Integer, db.ForeignKey('server.id'))
+#     server = db.relationship('Server', foreign_keys=server_id)
+#     # project
+#     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+#     project = db.relationship('Project', foreign_keys=project_id)
+#
+#     def __unicode__(self):
+#         return u'id: %d' % self.id

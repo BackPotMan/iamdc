@@ -20,7 +20,7 @@ db.create_all()
 # 导入蓝图
 modules = [
     ('ops.users.api', 'userBlue', '/users'),         # 用户管理模块
-#    ('ops.assets.api', 'assetsBlue', '/assets'),    # 资源管理模块
+    ('ops.assets.api', 'assetsBlue', '/assets'),     # 资源管理模块
 #    ('ops.deploy.api', 'deployBlue', '/deploy'),    # 发布系统模块
     ('ops.case.api', 'caseBlue', '/case'),          # 工单系统模块
 #    ('ops.setting.api', 'settingBlue', '/setting'), # 后台设置模块

@@ -1,0 +1,95 @@
+{% extends "index.html" %}
+
+<!-- page specific plugin styles -->
+{% block HeadPageSpecificPluginStyles %}
+    <!-- 特定页面CSS -->
+    <link rel="stylesheet" href="/static/css/jquery-ui-1.10.3.full.min.css" />
+    <link rel="stylesheet" href="/static/css/datepicker.css" />
+    <link rel="stylesheet" href="/static/css/ui.jqgrid.css" />
+{% endblock %}
+
+{% block BodyPageContent %}
+    <div class="main-content">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <script type="text/javascript">
+                try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+            </script>
+            <ul class="breadcrumb">
+                <li>
+                    <i class="icon-home home-icon"></i>
+                    <a href="/">Home</a>
+                </li>
+                <li class="active">项目管理</li>
+            </ul><!-- .breadcrumb -->
+        </div>
+        <div class="page-content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-small header-color-green3">
+                            <h5 class="lighter">搜索框</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <input id="autosearch" name="autosearch" type="checkbox" class="ace" onclick="enableAutosubmit(this.checked)" />
+                                        <span class="lbl">启用自动搜索</span>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                          <span class="input-group-addon">项目名称:</span>
+                                          <input type="text" id="search_cnname" placeholder=" 请输入项目名称" class="form-control search-query " onkeydown="doSearch(arguments[0]||event)" aria-describedby="basic-addon3" >
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-3">
+                                        <div class="input-group">
+                                          <span class="input-group-addon">英文名:</span>
+                                          <input type="text" id="search_enname" placeholder=" 请输入项目名" class="form-control search-query " onkeydown="doSearch(arguments[0]||event)" aria-describedby="basic-addon3" >
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button type="button" id="searchButton" name="searchButton" class="btn btn-purple btn-sm" onclick="gridReload();">
+                                                    搜索
+                                                    <i class="icon-search icon-on-right bigger-110"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+					<!-- PAGE CONTENT BEGINS -->
+					<table id="project-table"></table>
+					<div id="project-pager"></div>
+					<!-- PAGE CONTENT ENDS -->
+				</div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.page-content -->
+    </div><!-- /.main-content -->
+{% endblock %}
+
+<!-- page specific plugin scripts -->
+{% block BodyPageSpecificPluginScripts %}
+    <!-- 特定页面scripts -->
+    <script src="/static/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="/static/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="/static/js/jqGrid/i18n/grid.locale-en.js"></script>
+{% endblock %}
+
+
+<!-- inline scripts related to this page -->
+{% block BodyInlineScripts %}
+    <script src="/static/js/ops/project.js"></script>
+{% endblock %}

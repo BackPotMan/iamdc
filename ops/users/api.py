@@ -109,13 +109,23 @@ def userList():
             returnData['message'] = '编辑失败'
         return Response(json.dumps(returnData), mimetype="application/json")
 
-    ## 获取用户 选择框下拉列表
-    elif request.form.has_key('oper') and request.form['oper'] == "getusers":
+    ## 获取用户(给页面表格下拉框准备， 前端js函数：getUsers)
+    elif request.form.has_key('oper') and request.form['oper'] == "getUsers":
         allData = user.query.filter().all()
-        for record in allData:
-            returnData['data'].append({'id':record.id,'name':record.name,'cnname':record.cnname})
+        if allData:
+            userStr = ""  # 组合成适用于编辑框的select格式
+            for u in allData:
+                if userStr:
+                    userStr = userStr + ";" + str(u.id) + ":" + str(u.name)
+                else:
+                    userStr = str(u.id) + ":" + str(u.name)
+                returnData['data'].append({'id': u.id, 'name': u.name, 'cnname': u.cnname})
+            returnData['message'] = userStr
 
-        return Response(json.dumps(returnData['data']), mimetype="application/json")
+        else:
+            returnData['status'] = 1
+            returnData['message'] = "error"
+        return Response(json.dumps(returnData), mimetype="application/json")
 
     ## request.method == "GET":
     elif request.args.has_key('type') and request.args.get('type') == "load" or \

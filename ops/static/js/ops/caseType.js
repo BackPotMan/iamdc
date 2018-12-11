@@ -255,7 +255,7 @@ function getUsers(){
         url: '/users/user/',
         type: "POST",
         dataType: "json",
-        data:{'oper':"getusers"},
+        data:{'oper':"getUsers"},
         error: function () {
             alert("getUsers error");
         },
@@ -263,8 +263,8 @@ function getUsers(){
 
             $("#casetype_executor").append('<option value="0">--选择工单处理人--</option>');
 
-            for( key_num in data ){
-                $("#casetype_executor").append('<option value="' + data[key_num]['id'] + '">' + data[key_num]['cnname'] + '(' + data[key_num]['name']  + ')</option>');
+            for( key_num in data['data'] ){
+                $("#casetype_executor").append('<option value="' + data['data'][key_num]['id'] + '">' + data['data'][key_num]['cnname'] + '(' + data['data'][key_num]['name']  + ')</option>');
             };
 
         }

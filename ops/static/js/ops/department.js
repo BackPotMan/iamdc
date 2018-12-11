@@ -295,23 +295,23 @@ jQuery(function($) {
 
 //
 function getDepartment(){
-        var department_str = ""
-        $.ajax({
-            url: '/users/department/',
-            type: "POST",
-            dataType: "json",
-            async:false,  //设置为同步，等这个ajax有了返回值后才会执行下面的js
-            data:{'oper':"getDepartment"},
-            error: function () {
-                alert("getDepartment error");
-            },
-            success: function (data) {
-                //alert(data['message']);
-                department_str =  "0:顶级部门;"+data['message']
-            }
-        });
-        return department_str
-    }
+    var department_str = ""
+    $.ajax({
+        url: '/users/department/',
+        type: "POST",
+        dataType: "json",
+        async:false,  //设置为同步，等这个ajax有了返回值后才会执行下面的js
+        data:{'oper':"getDepartment"},
+        error: function () {
+            alert("getDepartment error");
+        },
+        success: function (data) {
+            //alert(data['message']);
+            department_str =  "0:顶级部门;"+data['message']
+        }
+    });
+    return department_str
+}
 
 // search
 var timeoutHnd;

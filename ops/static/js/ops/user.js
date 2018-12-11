@@ -17,7 +17,7 @@ jQuery(function($) {
             {name:'id',index:'id', width:70, sorttype:"int", editable: false},
             {name:'name',index:'name', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
             {name:'cnname',index:'cnname',width:150,editable:true,editoptions:{size:"20",maxlength:"30"}},
-            {name:'password',index:'password', width:110,editable: true,editoptions:{size:"20",maxlength:"30"}},
+            {name:'password',index:'password', width:110,editable: true,edittype:"password",editoptions:{size:"20",maxlength:"30"}},
             {name:'department',index:'department', width:110,editable: true,edittype:"select",editoptions:{value:getDepartment}},
             {name:'leader',index:'leader', width:110,editable: true,edittype:"select",editoptions:{value:"1:普通员工;0:部门负责人"}},
             {name:'role',index:'role', width:110,editable: true,edittype:"select",editoptions:{value:"1:普通账号;0:系统管理员"}},
