@@ -5,7 +5,7 @@ Flask-Script==2.0.6
 Jinja2==2.8
 SQLAlchemy==1.2.4
 Werkzeug==0.14.1
-paramiko==1.10.0
-setuptools==18.5
+paramiko==2.4.2
+setuptools==40.6.2
 distribute==0.7.3
 MySQL-python==1.2.5
