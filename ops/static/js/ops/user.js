@@ -1,8 +1,8 @@
 
-jQuery(function($) {
+var user_grid = "#user-table";
+var user_pager = "#user-pager";
 
-    var user_grid = "#user-table";
-	var user_pager = "#user-pager";
+jQuery(function($) {
 
     // table
     jQuery(user_grid).jqGrid({

@@ -1,8 +1,8 @@
 
-jQuery(function($) {
+var casehistory_grid = "#casehistory-table";
+var casehistory_pager = "#casehistory-pager";
 
-    var casehistory_grid = "#casehistory-table";
-	var casehistory_pager = "#casehistory-pager";
+jQuery(function($) {
 
     //table
     jQuery(casehistory_grid).jqGrid({

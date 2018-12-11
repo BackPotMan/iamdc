@@ -1,8 +1,8 @@
 
-jQuery(function($) {
+var casemycreate_grid = "#casemycreate-table";
+var casemycreate_pager = "#casemycreate-pager";
 
-    var casemycreate_grid = "#casemycreate-table";
-	var casemycreate_pager = "#casemycreate-pager";
+jQuery(function($) {
 
     // table
     jQuery(casemycreate_grid).jqGrid({

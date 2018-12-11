@@ -1,8 +1,8 @@
 
-jQuery(function($) {
+var casetype_grid = "#casetype-table";
+var casetype_pager = "#casetype-pager";
 
-    var casetype_grid = "#casetype-table";
-	var casetype_pager = "#casetype-pager";
+jQuery(function($) {
 
     // table
     jQuery(casetype_grid).jqGrid({

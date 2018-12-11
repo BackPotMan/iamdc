@@ -1,8 +1,8 @@
 
-jQuery(function($) {
+var department_grid = "#department-table";
+var department_pager = "#department-pager";
 
-    var department_grid = "#department-table";
-	var department_pager = "#department-pager";
+jQuery(function($) {
 
     // table
     jQuery(department_grid).jqGrid({

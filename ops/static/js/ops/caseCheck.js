@@ -1,8 +1,8 @@
 
-jQuery(function($) {
+var casecheck_grid = "#casecheck-table";
+var casecheck_pager = "#casecheck-pager";
 
-    var casecheck_grid = "#casecheck-table";
-	var casecheck_pager = "#casecheck-pager";
+jQuery(function($) {
 
     //table
     jQuery(casecheck_grid).jqGrid({

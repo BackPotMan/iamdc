@@ -1,8 +1,8 @@
 
-jQuery(function($) {
+var caseexecute_grid = "#caseexecute-table";
+var caseexecute_pager = "#caseexecute-pager";
 
-    var caseexecute_grid = "#caseexecute-table";
-	var caseexecute_pager = "#caseexecute-pager";
+jQuery(function($) {
 
     // table
     jQuery(caseexecute_grid).jqGrid({
