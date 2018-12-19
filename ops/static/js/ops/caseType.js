@@ -316,15 +316,15 @@ function getCheckLeader(obj){
         url: '/users/user/',
         type: "POST",
         dataType: "json",
-        data:{'oper':"getusers"},
+        data:{'oper':"getUsers"},
         error: function () {
             obj.parent().html((obj.parent().hasClass('firstcheckleader') ? '':'<span class="glyphicon glyphicon-arrow-right"></span>') +'<select class="checkleader" style="width:140px" ><option value="0">--选择指定审核人--</option></select>');
         },
         success: function (data) {
 
             var oplist = new Array();
-            for( key_num in data ){
-                oplist.push('<option value="' + data[key_num]['id'] + '">' + data[key_num]['cnname'] + '(' + data[key_num]['name']  + ')</option>');
+            for( key_num in data['data'] ){
+                oplist.push('<option value="' + data['data'][key_num]['id'] + '">' + data['data'][key_num]['cnname'] + '(' + data['data'][key_num]['name']  + ')</option>');
             }
 
             obj.parent().html((obj.parent().hasClass('firstcheckleader') ? '':'<span class="glyphicon glyphicon-arrow-right"></span>') +'<select class="checkleader" style="width:140px" ><option value="0">--选择指定审核人--</option>' + oplist.join('') + '</select>');
