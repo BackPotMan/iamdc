@@ -78,7 +78,7 @@ jQuery(function($) {
             editicon : 'icon-pencil blue',
             add: false,
             addicon : 'icon-plus-sign purple',
-            del: true,
+            del: false,
             delicon : 'icon-trash red',
             search: false,
             searchicon : 'icon-search orange',

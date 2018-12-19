@@ -383,8 +383,22 @@ def caseMyCreate():
         case_id = int(request.form['caseid'])
 
         getCase = case.query.filter(case.id == case_id).first()
-        db.session.delete(getCase)
-        db.session.commit()
+        if getCase.status.value in [1,2,3,7,11,12]:
+            db.session.delete(getCase)
+            db.session.commit()
+
+        return Response(json.dumps(returnData), mimetype="application/json")
+
+    ## 删除工单
+    elif request.form.has_key('oper') and request.form['oper'] == "del":
+        ids = str(request.form['id']).split(',')
+
+        for id in ids:
+            getCase = case.query.filter(case.id == id).first()
+            if not getCase.status.value in [1, 2, 3, 7, 11, 12]:
+                continue
+            db.session.delete(getCase)
+            db.session.commit()
 
         return Response(json.dumps(returnData), mimetype="application/json")
 
