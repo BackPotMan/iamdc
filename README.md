@@ -21,7 +21,7 @@ python 版本: Python 2.7.10
    source venv/bin/activate
 
 4、git clone 下载iamdc
-   git clone https://github.com/huangdongcong/iamdc.git
+   git clone https://github.com/BackPotMan/iamdc.git
 
 5、安装所需环境
    cd iamdc && pip install -r requirements.txt
